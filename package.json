@@ -7,21 +7,22 @@
     "blockchain",
     "compiler"
   ],
-  "version": "0.0.22",
-  "publisher": "JuanBlanco",
+  "version": "1.0.0",
+  "publisher": "beaugunderson",
   "engines": {
     "vscode": "^1.8.0"
   },
   "contributors": [
-    "Juan Blanco"
+    "Juan Blanco",
+    "Beau Gunderson"
   ],
   "bugs": {
-    "url": "https://github.com/juanfranblanco/vscode-solidity/issues"
+    "url": "https://github.com/beaugunderson/vscode-solidity/issues"
   },
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/juanfranblanco/vscode-solidity"
+    "url": "https://github.com/beaugunderson/vscode-solidity"
   },
   "categories": [
     "Languages",
@@ -30,8 +31,7 @@
   "activationEvents": [
     "onLanguage:solidity",
     "onCommand:solidity.compile",
-    "onCommand:solidity.compile.active",
-    "onCommand:solidity.codegen"
+    "onCommand:solidity.compile.active"
   ],
   "main": "./out/src/extension",
   "scripts": {
@@ -50,7 +50,7 @@
     "vscode-languageserver": "^3.3.0"
   },
   "devDependencies": {
-    "@types/node": "^8.0.14",
+    "@types/node": "^8.0.15",
     "tslint": "^5.5.0",
     "typescript": "^2.4.2",
     "vscode": "^1.1.4"
@@ -91,10 +91,6 @@
       {
         "command": "solidity.compile.active",
         "title": "Solidity: Compile Current Solidity Contract"
-      },
-      {
-        "command": "solidity.codegen",
-        "title": "Solidity: Code generate from compilation output 'contract.json'"
       }
     ],
     "keybindings": [

@@ -1,5 +1,5 @@
 
-import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver';
 
 function getDiagnosticSeverity(severity: string): DiagnosticSeverity {
     switch (severity) {
@@ -28,10 +28,10 @@ export function errorToDiagnostic(error: any): CompilerError {
         index = 2;
     }
 
-    let line = parseInt(errorSplit[index]);
-    let column = parseInt(errorSplit[index + 1]);
+    let line = parseInt(errorSplit[index], 10);
+    let column = parseInt(errorSplit[index + 1], 10);
     let severity = getDiagnosticSeverity(errorSplit[index + 2]);
- 
+
     return {
         diagnostic: {
             message: error,

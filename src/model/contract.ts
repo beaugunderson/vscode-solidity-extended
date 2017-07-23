@@ -1,14 +1,16 @@
 'use strict';
+
 import * as path from 'path';
 import * as util from '../util';
 
 export class Contract {
     public code: string;
-    // TODO: Import needs to be a class including if is local, absolutePath, module etc 
+    // TODO: Import needs to be a class including if is local, absolutePath, module etc
     public imports: Array<string>;
     public absolutePath: string;
     public packagePath: string;
     public abi: string;
+
     constructor(absoulePath: string, code: string) {
         this.absolutePath = this.formatPath(absoulePath);
         this.code = code;

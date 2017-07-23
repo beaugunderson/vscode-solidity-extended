@@ -2,9 +2,9 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+
 import {compileAllContracts} from './compileAll';
 import {compileActiveContract, initDiagnosticCollection} from './compileActive';
-import {codeGenerate} from './codegen';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind} from 'vscode-languageclient';
 
 let diagnosticCollection: vscode.DiagnosticCollection;
@@ -22,10 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.compile', () => {
         compileAllContracts(diagnosticCollection);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegen', (args: any[]) => {
-        codeGenerate(args, diagnosticCollection);
     }));
 
     const serverModule = path.join(__dirname, 'server.js');

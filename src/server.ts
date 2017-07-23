@@ -9,7 +9,7 @@ import {
     TextDocuments, InitializeResult,
     Files, DiagnosticSeverity, TextDocumentChangeEvent,
 } from 'vscode-languageserver';
-import { ContractCollection } from "./model/contractsCollection";
+import { ContractCollection } from './model/contractsCollection';
 import { errorToDiagnostic } from './compilerErrors';
 // import * as path from 'path';
 
@@ -55,7 +55,7 @@ export function compilationErrors(filePath, documentText) {
         filePath,
         documentText,
         projService.initialiseProject(rootPath));
-    
+
     const output = solc.compile({sources: contracts.getContractsForCompilation()}, 1);
 
     if (output.errors) {
@@ -136,8 +136,8 @@ function validate(document) {
     const diagnostics = soliumDiagnostics.concat(solcDiagnostics);
 
     connection.sendDiagnostics({
-        uri: document.uri,
         diagnostics,
+        uri: document.uri,
     });
 }
 
