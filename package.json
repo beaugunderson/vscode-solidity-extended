@@ -1,11 +1,10 @@
 {
   "name": "solidity",
-  "description": "Ethereum Solidity Language for Visual Studio Code",
+  "description": "Solidity support for Visual Studio Code",
   "keywords": [
-    "soliity",
+    "solidity",
     "ethereum",
-    "blockchain",
-    "compiler"
+    "blockchain"
   ],
   "version": "1.0.0",
   "publisher": "beaugunderson",
@@ -13,8 +12,8 @@
     "vscode": "^1.8.0"
   },
   "contributors": [
-    "Juan Blanco",
-    "Beau Gunderson"
+    "Beau Gunderson",
+    "Juan Blanco"
   ],
   "bugs": {
     "url": "https://github.com/beaugunderson/vscode-solidity/issues"
@@ -40,7 +39,6 @@
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "dependencies": {
-    "abi-code-gen": "0.0.3",
     "fs-extra": "^4.0.0",
     "read-yaml": "^1.1.0",
     "solc": "^0.4.13",
