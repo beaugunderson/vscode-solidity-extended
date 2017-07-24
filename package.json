@@ -1,12 +1,13 @@
 {
   "name": "solidity-extended",
+  "displayName": "Solidity Extended",
   "description": "Solidity support that aims to enable all of Visual Studio Code's features",
   "keywords": [
     "solidity",
     "ethereum",
     "blockchain"
   ],
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "beaugunderson",
   "engines": {
     "vscode": "^1.8.0"
@@ -15,10 +16,15 @@
     "Beau Gunderson",
     "Juan Blanco"
   ],
+  "homepage": "https://github.com/beaugunderson/vscode-solidity-extended",
   "bugs": {
     "url": "https://github.com/beaugunderson/vscode-solidity-extended/issues"
   },
   "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#ebf0f1",
+    "theme": "light"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/beaugunderson/vscode-solidity-extended"
