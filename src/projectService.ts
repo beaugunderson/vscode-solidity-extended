@@ -11,24 +11,31 @@ const packageDependenciesDirectory = 'dapple_packages';
 
 function createPackage(rootPath: string) {
     let projectPackageFile = path.join(rootPath, packageConfigFileName);
-    if (fs.existsSync(projectPackageFile)) {
-        // TODO: automapper
-        let packageConfig = readyaml.sync(projectPackageFile);
-        // TODO: throw expection / warn user of invalid package file
-        let projectPackage = new Package();
-        projectPackage.absoluletPath = rootPath;
-        if (packageConfig) {
-            if (packageConfig.layout !== undefined) {
-                projectPackage.build_dir = packageConfig.layout.build_dir;
-                projectPackage.sol_sources = packageConfig.layout.sol_sources;
-            }
-            projectPackage.name = packageConfig.name;
-            projectPackage.version = packageConfig.version;
-            projectPackage.dependencies = packageConfig.dependencies;
-        }
-        return projectPackage;
+
+    if (!fs.existsSync(projectPackageFile)) {
+        return;
     }
-    return null;
+
+    // TODO: automapper
+    let packageConfig = readyaml.sync(projectPackageFile);
+
+    // TODO: throw expection / warn user of invalid package file
+    let projectPackage = new Package();
+
+    projectPackage.absoluletPath = rootPath;
+
+    if (packageConfig) {
+        if (packageConfig.layout !== undefined) {
+            projectPackage.build_dir = packageConfig.layout.build_dir;
+            projectPackage.sol_sources = packageConfig.layout.sol_sources;
+        }
+
+        projectPackage.name = packageConfig.name;
+        projectPackage.version = packageConfig.version;
+        projectPackage.dependencies = packageConfig.dependencies;
+    }
+
+    return projectPackage;
 }
 
 export function initialiseProject(rootPath) {
@@ -47,6 +54,7 @@ function loadDependencies(rootPath: string, projectPackage: Package, depPackages
 
                 if (depPackage !== null) {
                     depPackages.push(depPackage);
+
                     // Assumed the package manager will install all the dependencies at root so adding all the existing ones
                     loadDependencies(rootPath, depPackage, depPackages);
                 } else {
@@ -60,10 +68,12 @@ function loadDependencies(rootPath: string, projectPackage: Package, depPackages
 
 function createProjectPackage(rootPath: string) {
     let projectPackage = createPackage(rootPath);
+
     // Default project package,this could be passed as a function
     if (projectPackage === null) {
         projectPackage = new Package();
         projectPackage.absoluletPath = rootPath;
     }
+
     return projectPackage;
 }

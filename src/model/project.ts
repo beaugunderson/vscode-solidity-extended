@@ -11,6 +11,7 @@ export class Project {
         this.dependencies = dependencies;
         this.packagesDir = packagesDir;
     }
+
     // This will need to add the current package as a parameter to resolve version dependencies
     public findPackage(contractDependencyImport: string) {
         return this.dependencies.find((depPack: Package) => depPack.isImportForThis(contractDependencyImport));
