@@ -1,6 +1,6 @@
 {
-  "name": "solidity",
-  "description": "Solidity support for Visual Studio Code",
+  "name": "solidity-extended",
+  "description": "Solidity support that aims to enable all of Visual Studio Code's features",
   "keywords": [
     "solidity",
     "ethereum",
@@ -16,15 +16,16 @@
     "Juan Blanco"
   ],
   "bugs": {
-    "url": "https://github.com/beaugunderson/vscode-solidity/issues"
+    "url": "https://github.com/beaugunderson/vscode-solidity-extended/issues"
   },
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/beaugunderson/vscode-solidity"
+    "url": "https://github.com/beaugunderson/vscode-solidity-extended"
   },
   "categories": [
     "Languages",
+    "Linters",
     "Snippets"
   ],
   "activationEvents": [
