@@ -1,4 +1,5 @@
 'use strict';
+
 import * as path from 'path';
 
 export class Package {
@@ -17,6 +18,7 @@ export class Package {
         if (this.sol_sources !== undefined || this.sol_sources === '') {
             return path.join(this.absoluletPath, this.sol_sources);
         }
+
         return this.absoluletPath;
     }
 
@@ -28,6 +30,7 @@ export class Package {
         if (this.isImportForThis(contractDependencyImport)) {
             return path.join(this.absoluletPath, this.sol_sources, contractDependencyImport.substring(this.name.length));
         }
+
         return null;
     }
 }

@@ -73,6 +73,25 @@
           ],
           "default": null,
           "description": "Compile using a remote version instead of the current one, for example: 'latest' or 'v0.4.3+commit.2353da71'"
+        },
+        "solidity.compilerRemappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "A compiler remapping",
+            "properties": {
+              "prefix": {
+                "type": "string",
+                "description": "The prefix to remap"
+              },
+              "target": {
+                "type": "string",
+                "description": "The target to remap the prefix to"
+              }
+            }
+          },
+          "default": [],
+          "description": "Compiler remappings"
         }
       }
     },

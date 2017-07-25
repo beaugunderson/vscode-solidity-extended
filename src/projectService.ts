@@ -42,6 +42,7 @@ export function initialiseProject(rootPath) {
     let projectPackage = createProjectPackage(rootPath);
     let dependencies = loadDependencies(rootPath, projectPackage);
     let packagesDirAbsolutePath = path.join(rootPath, packageDependenciesDirectory);
+
     return new Project(projectPackage, dependencies, packagesDirAbsolutePath);
 }
 
@@ -63,14 +64,15 @@ function loadDependencies(rootPath: string, projectPackage: Package, depPackages
             }
         });
     }
+
     return depPackages;
 }
 
 function createProjectPackage(rootPath: string) {
     let projectPackage = createPackage(rootPath);
 
-    // Default project package,this could be passed as a function
-    if (projectPackage === null) {
+    // Default project package, this could be passed as a function
+    if (!projectPackage) {
         projectPackage = new Package();
         projectPackage.absoluletPath = rootPath;
     }

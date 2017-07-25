@@ -26,7 +26,9 @@ export class ContractCollection {
         let contractsForCompilation = {};
 
         this.contracts.forEach(contract => {
-            contractsForCompilation[contract.absolutePath] = contract.code;
+            contractsForCompilation[contract.absolutePath] = {
+                content: contract.code,
+            };
         });
 
         return contractsForCompilation;
@@ -35,25 +37,25 @@ export class ContractCollection {
     public addContractAndResolveImports(contractPath: string, code: string, project: Project) {
         let contract = this.addContract(contractPath, code);
 
-        if (contract !== null) {
-            contract.resolveImports();
-
-            contract.imports.forEach(foundImport => {
-                if (fs.existsSync(foundImport)) {
-                    if (!this.containsContract(foundImport)) {
-                        let importContractCode = this.readContractCode(foundImport);
-
-                        if (importContractCode != null) {
-                            this.addContractAndResolveImports(foundImport, importContractCode, project);
-                        }
-                    }
-                } else {
-                    this.addContractAndResolveDependencyImport(foundImport, contract, project);
-                }
-            });
+        if (!contract) {
+            return null;
         }
 
-        return contract;
+        contract.resolveImports();
+
+        contract.imports.forEach(foundImport => {
+            if (fs.existsSync(foundImport)) {
+                if (!this.containsContract(foundImport)) {
+                    let importContractCode = this.readContractCode(foundImport);
+
+                    if (importContractCode != null) {
+                        this.addContractAndResolveImports(foundImport, importContractCode, project);
+                    }
+                }
+            } else {
+                this.addContractAndResolveDependencyImport(foundImport, contract, project);
+            }
+        });
     }
 
     private addContract(contractPath: string, code: string) {
@@ -63,8 +65,6 @@ export class ContractCollection {
 
             return contract;
         }
-
-        return null;
     }
 
     private formatPath(contractPath: string) {
@@ -91,8 +91,6 @@ export class ContractCollection {
         if (fs.existsSync(contractPath)) {
             return fs.readFileSync(contractPath, 'utf8');
         }
-
-        return null;
     }
 
     private addContractAndResolveDependencyImport(dependencyImport: string, contract: Contract, project: Project) {

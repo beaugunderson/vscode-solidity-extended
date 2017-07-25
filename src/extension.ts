@@ -1,29 +1,14 @@
 'use strict';
 
 import * as path from 'path';
-import * as vscode from 'vscode';
-
 import {compileAllContracts} from './compileAll';
 import {compileActiveContract, initDiagnosticCollection} from './compileActive';
+import {DiagnosticCollection, ExtensionContext, commands, languages, workspace} from 'vscode';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind} from 'vscode-languageclient';
 
-let diagnosticCollection: vscode.DiagnosticCollection;
+let diagnosticCollection: DiagnosticCollection;
 
-export function activate(context: vscode.ExtensionContext) {
-    diagnosticCollection = vscode.languages.createDiagnosticCollection('solidity');
-
-    context.subscriptions.push(diagnosticCollection);
-
-    initDiagnosticCollection(diagnosticCollection);
-
-    context.subscriptions.push(vscode.commands.registerCommand('solidity.compile.active', () => {
-        compileActiveContract();
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand('solidity.compile', () => {
-        compileAllContracts(diagnosticCollection);
-    }));
-
+export function activate(context: ExtensionContext) {
     const serverModule = path.join(__dirname, 'server.js');
 
     const serverOptions: ServerOptions = {
@@ -42,6 +27,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: ['solidity'],
+        synchronize: {
+            configurationSection: 'solidity',
+            fileEvents: workspace.createFileSystemWatcher('**/.soliumrc.json'),
+        },
     };
 
     const client = new LanguageClient(
@@ -50,5 +39,20 @@ export function activate(context: vscode.ExtensionContext) {
         serverOptions,
         clientOptions);
 
-    context.subscriptions.push(client.start());
+    diagnosticCollection = languages.createDiagnosticCollection('solidity');
+
+    context.subscriptions.push(diagnosticCollection);
+
+    initDiagnosticCollection(diagnosticCollection);
+
+    context.subscriptions.push(
+        client.start(),
+
+        commands.registerCommand('solidity.compile.active', () => {
+            compileActiveContract();
+        }),
+
+        commands.registerCommand('solidity.compile', () => {
+            compileAllContracts(diagnosticCollection);
+        }));
 }

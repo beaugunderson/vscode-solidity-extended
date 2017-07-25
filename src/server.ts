@@ -1,17 +1,49 @@
 'use strict';
 
+import * as fs from 'fs';
+import * as findUp from 'find-up';
+import * as path from 'path';
 import * as projService from './projectService';
 import * as solc from 'solc';
 import * as Solium from 'solium';
+
 import {
-    createConnection, IConnection,
-    IPCMessageReader, IPCMessageWriter,
-    TextDocuments, InitializeResult,
-    Files, DiagnosticSeverity, TextDocumentChangeEvent,
+    Diagnostic,
+    DiagnosticSeverity,
+    Files,
+    IConnection,
+    IPCMessageReader,
+    IPCMessageWriter,
+    InitializeResult,
+    TextDocumentChangeEvent,
+    TextDocuments,
+    createConnection,
 } from 'vscode-languageserver';
-import { ContractCollection } from './model/contractsCollection';
-import { errorToDiagnostic } from './compilerErrors';
-// import * as path from 'path';
+
+import {ContractCollection} from './model/contractsCollection';
+import {errorToDiagnostic} from './compilerErrors';
+
+const DEFAULT_SOLIUM_OPTIONS = {
+    rules: {
+        'array-declarations': true,
+        'blank-lines': true,
+        camelcase: true,
+        'deprecated-suicide': true,
+        'double-quotes': true,
+        'imports-on-top': true,
+        indentation: true,
+        lbrace: true,
+        mixedcase: true,
+        'no-empty-blocks': true,
+        'no-unused-vars': true,
+        'no-with': true,
+        'operator-whitespace': true,
+        'pragma-on-top': true,
+        uppercase: true,
+        'variable-declarations': true,
+        whitespace: true,
+    },
+};
 
 // Create a connection for the server
 const connection: IConnection = createConnection(
@@ -45,21 +77,57 @@ function itemToDiagnostic(item) {
             },
         },
         severity: severity,
+        source: 'solium',
     };
 }
 
-export function compilationErrors(filePath, documentText) {
+function compilationErrors(filePath, documentText): Diagnostic[] {
     const contracts = new ContractCollection();
 
-    contracts.addContractAndResolveImports(
-        filePath,
-        documentText,
-        projService.initialiseProject(rootPath));
+    try {
+        contracts.addContractAndResolveImports(
+            filePath,
+            documentText,
+            projService.initialiseProject(rootPath));
 
-    const output = solc.compile({sources: contracts.getContractsForCompilation()}, 1);
+        let input = {
+            language: 'Solidity',
+            optimizer: {
+                enabled: true,
+            },
+            settings: {
+                outputSelection: ['metadata'],
+                remappings: compilerRemappings.map(mapping => `${mapping.prefix}=${mapping.target}`),
+            },
+            sources: contracts.getContractsForCompilation(),
+        };
 
-    if (output.errors) {
-        return output.errors.map((error) => errorToDiagnostic(error).diagnostic);
+        const output: string = solc.compileStandardWrapper(JSON.stringify(input), (importPath) => {
+            try {
+                return {
+                    contents: fs.readFileSync(importPath, 'utf-8'),
+                };
+            } catch (err) {
+                return {
+                    error: `Unable to read "${importPath}": ${err}`,
+                };
+            }
+        });
+
+        if (output) {
+            const parsedOutput = JSON.parse(output);
+
+            if (parsedOutput.errors) {
+                return parsedOutput.errors.map((error) => errorToDiagnostic(error).diagnostic);
+            }
+        }
+
+        return [];
+    } catch (err) {
+        connection.window.showErrorMessage('solc error: ' + err);
+
+        console.error('solc error: ' + err);
+        console.error('solc error: ' + err.stack);
     }
 
     return [];
@@ -128,7 +196,7 @@ function validate(document) {
 }
 
 function validateAll() {
-    return documents.all().forEach(document => validate(document));
+    return documents.all().forEach(validate);
 }
 
 documents.onDidChangeContent(event => validate(event.document));
@@ -141,10 +209,42 @@ documents.onDidClose(event => connection.sendDiagnostics({
 
 documents.listen(connection);
 
-connection.onInitialize((result): InitializeResult => {
-    rootPath = result.rootPath;
+let compilerRemappings: [CompilerRemapping];
+
+interface CompilerRemapping {
+    prefix: string;
+    target: string;
+}
+
+interface Settings {
+    solidity: {
+        remoteCompilerVersion: string,
+        compilerRemappings: [CompilerRemapping],
+    };
+}
+
+connection.onDidChangeWatchedFiles((params) => {
+    params.changes.forEach((change) => {
+        const filePath = Files.uriToFilePath(change.uri);
+        const fileName = path.basename(filePath);
+
+        if (fileName === '.soliumrc.json') {
+            validateAll();
+        }
+    });
+});
+
+// The settings have changed. Is sent on server activation as well.
+connection.onDidChangeConfiguration((params) => {
+    let settings = <Settings>params.settings;
+
+    compilerRemappings = settings.solidity.compilerRemappings;
 
     validateAll();
+});
+
+connection.onInitialize((result): InitializeResult => {
+    rootPath = result.rootPath;
 
     return {
         capabilities: {
@@ -152,7 +252,5 @@ connection.onInitialize((result): InitializeResult => {
         },
     };
 });
-
-connection.onDidChangeConfiguration(() => validateAll());
 
 connection.listen();
