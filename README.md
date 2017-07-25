@@ -26,11 +26,23 @@ This extension provides:
 
 ## Configuration
 
+### compileUsingRemoteVersion
+
 To compile using a different version of Solidity, for example latest or 'v0.4.3+commit.2353da71', use the user settings as follows:
 
 ```
 {
     "solidity.compileUsingRemoteVersion" : "latest"
+}
+```
+
+### compilerRemappings
+
+Compiler remappings can be specified as an array of objects with a `prefix` and `target` property.
+
+```
+{
+    "solidity.compilerRemappings": [{"prefix": "ROOT", "target": "./src"}]
 }
 ```
 
