@@ -65,35 +65,21 @@ export function compilationErrors(filePath, documentText) {
     return [];
 }
 
-function solium(filePath, documentText) {
-    // const fileDirectory = path.dirname(filePath);
-    // const fileName = path.basename(filePath);
+function solium(filePath, documentText): Diagnostic[] {
+    const fileDirectory = path.dirname(filePath);
+    const fileName = path.basename(filePath);
 
     let items = [];
+    let soliumOptions = DEFAULT_SOLIUM_OPTIONS;
+
+    const soliumConfigPath = findUp.sync('.soliumrc.json', {cwd: fileDirectory});
+
+    if (soliumConfigPath) {
+        soliumOptions = require(soliumConfigPath);
+    }
 
     try {
-        items = Solium.lint(documentText, {
-            // TODO climb up the filesystem until we find a .soliumrc.json and use that
-            rules: {
-                'array-declarations': true,
-                'blank-lines': true,
-                camelcase: true,
-                'deprecated-suicide': true,
-                'double-quotes': true,
-                'imports-on-top': true,
-                indentation: true,
-                lbrace: true,
-                mixedcase: true,
-                'no-empty-blocks': true,
-                'no-unused-vars': true,
-                'no-with': true,
-                'operator-whitespace': true,
-                'pragma-on-top': true,
-                uppercase: true,
-                'variable-declarations': true,
-                whitespace: true,
-            },
-        });
+        items = Solium.lint(documentText, soliumOptions);
     } catch (err) {
         let match = /An error .*?\nSyntaxError: (.*?) Line: (\d+), Column: (\d+)/.exec(err.message);
 
