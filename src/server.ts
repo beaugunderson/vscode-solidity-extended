@@ -22,6 +22,30 @@ import {
 import {ContractCollection} from './model/contractsCollection';
 import {errorToDiagnostic} from './compilerErrors';
 
+const FIFTEEN_SECONDS = 15 * 1000;
+
+let validationLocked = 0;
+
+function now() {
+    return new Date().valueOf();
+}
+
+function lockedAndLockIsValid() {
+    if (validationLocked > (now() - FIFTEEN_SECONDS)) {
+        return true;
+    }
+
+    return false;
+}
+
+function lockValidation() {
+    validationLocked = now();
+}
+
+function unlockValidation() {
+    validationLocked = 0;
+}
+
 const DEFAULT_SOLIUM_OPTIONS = {
     rules: {
         'array-declarations': true,
@@ -181,6 +205,12 @@ function solium(filePath, documentText): Diagnostic[] {
 }
 
 function validate(document) {
+    if (lockedAndLockIsValid()) {
+        return;
+    }
+
+    lockValidation();
+
     const filePath = Files.uriToFilePath(document.uri);
     const documentText = document.getText();
 
@@ -193,6 +223,8 @@ function validate(document) {
         diagnostics,
         uri: document.uri,
     });
+
+    unlockValidation();
 }
 
 function validateAll() {
