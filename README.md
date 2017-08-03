@@ -22,7 +22,7 @@ This extension provides:
 ### Compile all contracts
 
 * <kbd>F1</kbd> `>Solidity: Compile all Solidity Contracts`
-* <kbd>Ctrl</kbd> + <kbd>F5<kbd> / <kbd>Cmd</kbd> + <kbd>F5</kbd>
+* <kbd>Ctrl</kbd> + <kbd>F5</kbd> / <kbd>Cmd</kbd> + <kbd>F5</kbd>
 
 ## Configuration
 
