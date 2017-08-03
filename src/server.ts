@@ -5,7 +5,6 @@ import * as findUp from 'find-up';
 import * as path from 'path';
 import * as projService from './projectService';
 import * as solc from 'solc';
-import * as Solium from 'solium';
 
 import {
     Diagnostic,
@@ -56,6 +55,7 @@ console.error = connection.console.error.bind(connection.console);
 const documents: TextDocuments = new TextDocuments();
 
 let rootPath;
+let Solium;
 
 function itemToDiagnostic(item) {
     const severity = item.type === 'warning' ?
@@ -245,6 +245,18 @@ connection.onDidChangeConfiguration((params) => {
 
 connection.onInitialize((result): InitializeResult => {
     rootPath = result.rootPath;
+
+    let localSolium = path.join(rootPath, 'node_modules', 'solium', 'lib', 'solium.js');
+
+    if (fs.existsSync(localSolium)) {
+        console.log('Loading local solium');
+
+        Solium = require(localSolium);
+    } else {
+        console.log('Loading global solium');
+
+        Solium = require('solium');
+    }
 
     return {
         capabilities: {
