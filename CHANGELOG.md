@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Update `solc` to 0.4.14
+
 ## 2.0.0
 
 - The linter now checks for a copy of Solium in `${workspaceRoot}/node_modules` and prefers that if it exists, this is useful for running a forked copy of Solium
