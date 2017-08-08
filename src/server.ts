@@ -121,7 +121,7 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
             },
             settings: {
                 outputSelection: ['metadata'],
-                remappings: compilerRemappings.map(mapping => `${mapping.prefix}=${mapping.target}`),
+                remappings: compilerRemappings.map(mapping => `${mapping.prefix}=${path.resolve(mapping.target).replace(/\\/g, '\/')}`),
             },
             sources: contracts.getContractsForCompilation(),
         };
