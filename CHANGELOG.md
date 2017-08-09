@@ -1,3 +1,7 @@
+## 2.1.1
+
+- Normalize paths passed to `solc`
+
 ## 2.1.0
 
 - Update `solc` to 0.4.14
