@@ -7,7 +7,7 @@
     "ethereum",
     "blockchain"
   ],
-  "version": "2.1.1",
+  "version": "2.1.2",
   "publisher": "beaugunderson",
   "engines": {
     "vscode": "^1.8.0"
@@ -48,18 +48,20 @@
   "dependencies": {
     "find-up": "^2.1.0",
     "fs-extra": "^4.0.1",
+    "moment": "^2.18.1",
     "read-yaml": "^1.1.0",
-    "solc": "^0.4.14",
+    "solc": "^0.4.16",
     "solium": "^0.5.5",
     "truffle-artifactor": "^2.1.5",
     "vscode-languageclient": "^3.3.0",
-    "vscode-languageserver": "^3.3.0"
+    "vscode-languageserver": "^3.3.0",
+    "vscode-uri": "^1.0.1"
   },
   "devDependencies": {
-    "@types/node": "^8.0.19",
-    "tslint": "^5.6.0",
-    "typescript": "^2.4.2",
-    "vscode": "^1.1.4"
+    "@types/node": "^8.0.26",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.1",
+    "vscode": "^1.1.5"
   },
   "contributes": {
     "configuration": {

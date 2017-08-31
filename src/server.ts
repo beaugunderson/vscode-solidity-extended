@@ -1,11 +1,11 @@
 'use strict';
 
-import * as fs from 'fs';
 import * as findUp from 'find-up';
+import * as fs from 'fs';
+import * as moment from 'moment';
 import * as path from 'path';
 import * as projService from './projectService';
 import * as solc from 'solc';
-
 import {
     Diagnostic,
     DiagnosticSeverity,
@@ -18,20 +18,33 @@ import {
     TextDocuments,
     createConnection,
 } from 'vscode-languageserver';
+import Uri from 'vscode-uri';
 
 import {ContractCollection} from './model/contractsCollection';
 import {errorToDiagnostic} from './compilerErrors';
 
-const FIFTEEN_SECONDS = 15 * 1000;
+const TWO_MINUTES = 2 * 60 * 1000;
 
 let validationLocked = 0;
+
+function uriToBasename(uri: string) {
+    return path.basename(Uri.parse(uri).fsPath);
+}
 
 function now() {
     return new Date().valueOf();
 }
 
+function timestamp() {
+    return moment().format('HH:mm:ss.SS');
+}
+
+function log(string) {
+    console.log(`${timestamp()} ${string}`);
+}
+
 function lockedAndLockIsValid() {
-    if (validationLocked > (now() - FIFTEEN_SECONDS)) {
+    if (validationLocked > (now() - TWO_MINUTES)) {
         return true;
     }
 
@@ -205,17 +218,28 @@ function solium(filePath, documentText): Diagnostic[] {
 }
 
 function validate(document) {
+    const start = moment();
+
     if (lockedAndLockIsValid()) {
+        log('skipping validation');
+
         return;
     }
 
     lockValidation();
 
+    log(`validating ${uriToBasename(document.uri)}`);
+
     const filePath = Files.uriToFilePath(document.uri);
     const documentText = document.getText();
 
+    const soliumStart = moment();
     const soliumDiagnostics = solium(filePath, documentText);
+    const soliumEnd = moment();
+
+    const solcStart = moment();
     const solcDiagnostics = compilationErrors(filePath, documentText);
+    const solcEnd = moment();
 
     const diagnostics = soliumDiagnostics.concat(solcDiagnostics);
 
@@ -225,13 +249,22 @@ function validate(document) {
     });
 
     unlockValidation();
+
+    log(`validation complete in ${moment().diff(start, 'seconds')}s ` +
+        `(solium: ${soliumEnd.diff(soliumStart, 'seconds')}s, ${solcEnd.diff(solcStart, 'seconds')}s)`);
 }
 
 function validateAll() {
+    log('validateAll');
+
     return documents.all().forEach(validate);
 }
 
-documents.onDidChangeContent(event => validate(event.document));
+documents.onDidChangeContent(event => {
+    log(`document changed: ${uriToBasename(event.document.uri)}`);
+
+    validate(event.document);
+});
 
 // remove diagnostics from the Problems panel when we close the file
 documents.onDidClose(event => connection.sendDiagnostics({
@@ -255,19 +288,18 @@ interface Settings {
     };
 }
 
-connection.onDidChangeWatchedFiles((params) => {
-    params.changes.forEach((change) => {
-        const filePath = Files.uriToFilePath(change.uri);
-        const fileName = path.basename(filePath);
-
-        if (fileName === '.soliumrc.json') {
+connection.onDidChangeWatchedFiles(params => {
+    params.changes.forEach(change => {
+        if (uriToBasename(change.uri) === '.soliumrc.json') {
             validateAll();
         }
     });
 });
 
 // The settings have changed. Is sent on server activation as well.
-connection.onDidChangeConfiguration((params) => {
+connection.onDidChangeConfiguration(params => {
+    log('onDidChangeConfiguration');
+
     let settings = <Settings>params.settings;
 
     compilerRemappings = settings.solidity.compilerRemappings;
@@ -281,11 +313,11 @@ connection.onInitialize((result): InitializeResult => {
     let localSolium = path.join(rootPath, 'node_modules', 'solium', 'lib', 'solium.js');
 
     if (fs.existsSync(localSolium)) {
-        console.log('Loading local solium');
+        log('loading local solium');
 
         Solium = require(localSolium);
     } else {
-        console.log('Loading global solium');
+        log('loading global solium');
 
         Solium = require('solium');
     }

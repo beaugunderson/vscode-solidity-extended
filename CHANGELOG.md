@@ -1,3 +1,9 @@
+## 2.1.2
+
+- Add debug logging to diagnose linting slowdowns
+- Update `solc` to 0.4.16
+- Update other dependencies
+
 ## 2.1.1
 
 - Normalize paths passed to `solc`
