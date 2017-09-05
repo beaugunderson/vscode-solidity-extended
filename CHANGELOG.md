@@ -1,3 +1,7 @@
+## 2.2.0
+
+- Added `solidity.lintOnChange` and `solidity.lintOnSave` configuration options
+
 ## 2.1.2
 
 - Add debug logging to diagnose linting slowdowns

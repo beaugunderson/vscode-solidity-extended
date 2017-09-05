@@ -7,7 +7,7 @@
     "ethereum",
     "blockchain"
   ],
-  "version": "2.1.2",
+  "version": "2.2.0",
   "publisher": "beaugunderson",
   "engines": {
     "vscode": "^1.8.0"
@@ -60,7 +60,7 @@
   "devDependencies": {
     "@types/node": "^8.0.26",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.1",
+    "typescript": "^2.5.2",
     "vscode": "^1.1.5"
   },
   "contributes": {
@@ -68,6 +68,20 @@
       "type": "object",
       "title": "Solidity configuration",
       "properties": {
+        "solidity.lintOnSave": {
+          "type": [
+            "boolean"
+          ],
+          "default": true,
+          "description": "Lint an open file when it's saved"
+        },
+        "solidity.lintOnChange": {
+          "type": [
+            "boolean"
+          ],
+          "default": true,
+          "description": "Lint an open file when it's changed"
+        },
         "solidity.compileUsingRemoteVersion": {
           "type": [
             "string",

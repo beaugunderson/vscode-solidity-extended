@@ -134,7 +134,8 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
             },
             settings: {
                 outputSelection: ['metadata'],
-                remappings: compilerRemappings.map(mapping => `${mapping.prefix}=${path.resolve(mapping.target).replace(/\\/g, '\/')}`),
+                remappings: soliditySettings.compilerRemappings.map(mapping =>
+                    `${mapping.prefix}=${path.resolve(mapping.target).replace(/\\/g, '\/')}`),
             },
             sources: contracts.getContractsForCompilation(),
         };
@@ -228,7 +229,9 @@ function validate(document) {
 
     lockValidation();
 
-    log(`validating ${uriToBasename(document.uri)}`);
+    const name = uriToBasename(document.uri);
+
+    log(`validating ${name}`);
 
     const filePath = Files.uriToFilePath(document.uri);
     const documentText = document.getText();
@@ -250,8 +253,8 @@ function validate(document) {
 
     unlockValidation();
 
-    log(`validation complete in ${moment().diff(start, 'seconds')}s ` +
-        `(solium: ${soliumEnd.diff(soliumStart, 'seconds')}s, ${solcEnd.diff(solcStart, 'seconds')}s)`);
+    log(`validating ${name} done in ${moment().diff(start, 'seconds')}s ` +
+        `(solium: ${soliumEnd.diff(soliumStart, 'seconds')}s, solc: ${solcEnd.diff(solcStart, 'seconds')}s)`);
 }
 
 function validateAll() {
@@ -260,10 +263,20 @@ function validateAll() {
     return documents.all().forEach(validate);
 }
 
+documents.onDidSave(event => {
+    log(`document saved: ${uriToBasename(event.document.uri)}`);
+
+    if (soliditySettings.lintOnSave) {
+        validate(event.document);
+    }
+});
+
 documents.onDidChangeContent(event => {
     log(`document changed: ${uriToBasename(event.document.uri)}`);
 
-    validate(event.document);
+    if (soliditySettings.lintOnChange) {
+        validate(event.document);
+    }
 });
 
 // remove diagnostics from the Problems panel when we close the file
@@ -274,19 +287,19 @@ documents.onDidClose(event => connection.sendDiagnostics({
 
 documents.listen(connection);
 
-let compilerRemappings: [CompilerRemapping];
-
 interface CompilerRemapping {
     prefix: string;
     target: string;
 }
 
-interface Settings {
-    solidity: {
-        remoteCompilerVersion: string,
-        compilerRemappings: [CompilerRemapping],
-    };
+interface SoliditySettings {
+    compilerRemappings: [CompilerRemapping];
+    lintOnChange: boolean;
+    lintOnSave: boolean;
+    remoteCompilerVersion: string;
 }
+
+let soliditySettings: SoliditySettings;
 
 connection.onDidChangeWatchedFiles(params => {
     params.changes.forEach(change => {
@@ -300,9 +313,7 @@ connection.onDidChangeWatchedFiles(params => {
 connection.onDidChangeConfiguration(params => {
     log('onDidChangeConfiguration');
 
-    let settings = <Settings>params.settings;
-
-    compilerRemappings = settings.solidity.compilerRemappings;
+    soliditySettings = <SoliditySettings>params.settings.solidity;
 
     validateAll();
 });

@@ -46,6 +46,26 @@ Compiler remappings can be specified as an array of objects with a `prefix` and 
 }
 ```
 
+### lintOnChange
+
+Lint open files when they're changed, regardless of whether they've been saved. It may be useful to set this to false if the contracts you're working on take a long time to compile.
+
+```
+{
+    "solidity.lintOnChange": true
+}
+```
+
+### lintOnSave
+
+Lint open files when they're saved.
+
+```
+{
+    "solidity.lintOnSave": true
+}
+```
+
 ## Credits
 
 Many thanks to [Juan Blanco](https://github.com/juanfranblanco), this extension is forked from his original [vscode-solidity](https://github.com/juanfranblanco/vscode-solidity) extension.
