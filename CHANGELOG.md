@@ -1,3 +1,7 @@
+## 2.4.0
+
+- Added `solidity.persistErrors` configuration option
+
 ## 2.3.0
 
 - Added `solidity.lintOnOpen` configuration option

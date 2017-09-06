@@ -46,6 +46,16 @@ Compiler remappings can be specified as an array of objects with a `prefix` and 
 }
 ```
 
+### persistErrors
+
+Persist errors for a linter if it's not run during the next validation event. For example, if there are `solium` errors and `lintOnSave` is set to `"solc-only"`, only `solc` will run. If `persistErrors` is set to `true`, the `solium` errors will remain. If it is set to `false`, they will be cleared.
+
+```
+{
+    "solidity.persistErrors": true
+}
+```
+
 ### Common settings for linter options
 
 The follow three options take these values:

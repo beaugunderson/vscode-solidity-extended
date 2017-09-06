@@ -27,6 +27,9 @@ const TWO_MINUTES = 2 * 60 * 1000;
 
 let validationLocked = 0;
 
+let lastSolcErrors: Array<Diagnostic> = [];
+let lastSoliumErrors: Array<Diagnostic> = [];
+
 function uriToBasename(uri: string) {
     return path.basename(Uri.parse(uri).fsPath);
 }
@@ -235,18 +238,24 @@ function validate(document, validators: LinterChoice = true) {
 
     if (validators === true || validators === 'solium-only') {
         const soliumStart = moment();
-        diagnostics = diagnostics.concat(solium(filePath, documentText));
+        lastSoliumErrors = solium(filePath, documentText);
+        diagnostics = diagnostics.concat(lastSoliumErrors);
         const soliumEnd = moment();
 
         log(`validating ${name}, solium done in ${soliumEnd.diff(soliumStart, 'seconds')}s`);
+    } else if (soliditySettings.persistErrors) {
+        diagnostics = diagnostics.concat(lastSoliumErrors);
     }
 
     if (validators === true || validators === 'solc-only') {
         const solcStart = moment();
-        diagnostics = diagnostics.concat(compilationErrors(filePath, documentText));
+        lastSolcErrors = compilationErrors(filePath, documentText);
+        diagnostics = diagnostics.concat(lastSolcErrors);
         const solcEnd = moment();
 
         log(`validating ${name}, solc done in ${solcEnd.diff(solcStart, 'seconds')}s`);
+    } else if (soliditySettings.persistErrors) {
+        diagnostics = diagnostics.concat(lastSolcErrors);
     }
 
     connection.sendDiagnostics({
@@ -313,6 +322,7 @@ interface SoliditySettings {
     lintOnChange: LinterChoice;
     lintOnOpen: LinterChoice;
     lintOnSave: LinterChoice;
+    persistErrors: boolean;
     remoteCompilerVersion: string;
 }
 

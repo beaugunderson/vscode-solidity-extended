@@ -7,7 +7,7 @@
     "ethereum",
     "blockchain"
   ],
-  "version": "2.3.0",
+  "version": "2.4.0",
   "publisher": "beaugunderson",
   "engines": {
     "vscode": "^1.8.0"
@@ -136,6 +136,11 @@
           ],
           "default": true,
           "description": "Lint an open file when it's saved"
+        },
+        "solidity.persistErrors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Persist errors for any linters that aren't run (e.g. persist solium errors if only solc is run)"
         }
       }
     },
