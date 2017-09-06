@@ -1,3 +1,7 @@
+## 2.4.1
+
+- Add proper highlighting for `internal`
+
 ## 2.4.0
 
 - Added `solidity.persistErrors` configuration option
