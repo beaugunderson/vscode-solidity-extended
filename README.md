@@ -91,7 +91,7 @@ Lint files immediately upon opening.
 
 ```
 {
-    "solidity.lintOnOpening": true
+    "solidity.lintOnOpen": true
 }
 ```
 
