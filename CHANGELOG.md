@@ -1,3 +1,7 @@
+## 2.4.2
+
+- Add proper highlighting for `using`
+
 ## 2.4.1
 
 - Add proper highlighting for `internal`
