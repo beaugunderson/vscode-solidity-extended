@@ -1,3 +1,8 @@
+## 2.3.0
+
+- Added `solidity.lintOnOpen` configuration option
+- Added `"solium-only"` and `"solc-only"` options for all settings
+
 ## 2.2.0
 
 - Added `solidity.lintOnChange` and `solidity.lintOnSave` configuration options

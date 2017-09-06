@@ -16,13 +16,13 @@ This extension provides:
 
 ### Compile the current contract
 
-* <kbd>F1</kbd> `>Solidity: Compile Current Solidity Contract`
-* <kbd>F5</kbd>
+- <kbd>F1</kbd> `>Solidity: Compile Current Solidity Contract`
+- <kbd>F5</kbd>
 
 ### Compile all contracts
 
-* <kbd>F1</kbd> `>Solidity: Compile all Solidity Contracts`
-* <kbd>Ctrl</kbd> + <kbd>F5</kbd> / <kbd>Cmd</kbd> + <kbd>F5</kbd>
+- <kbd>F1</kbd> `>Solidity: Compile all Solidity Contracts`
+- <kbd>Ctrl</kbd> + <kbd>F5</kbd> / <kbd>⌘</kbd> + <kbd>F5</kbd>
 
 ## Configuration
 
@@ -46,6 +46,15 @@ Compiler remappings can be specified as an array of objects with a `prefix` and 
 }
 ```
 
+### Common settings for linter options
+
+The follow three options take these values:
+
+- `true` (execute all linters)
+- `false` (execute no linters)
+- `"solc-only"` (only execute solc)
+- `"solium-only"` (only execute solium)
+
 ### lintOnChange
 
 Lint open files when they're changed, regardless of whether they've been saved. It may be useful to set this to false if the contracts you're working on take a long time to compile.
@@ -63,6 +72,16 @@ Lint open files when they're saved.
 ```
 {
     "solidity.lintOnSave": true
+}
+```
+
+### lintOnOpen
+
+Lint files immediately upon opening.
+
+```
+{
+    "solidity.lintOnOpening": true
 }
 ```
 

@@ -218,9 +218,7 @@ function solium(filePath, documentText): Diagnostic[] {
     return items.map(itemToDiagnostic);
 }
 
-function validate(document) {
-    const start = moment();
-
+function validate(document, validators: LinterChoice = true) {
     if (lockedAndLockIsValid()) {
         log('skipping validation');
 
@@ -230,21 +228,26 @@ function validate(document) {
     lockValidation();
 
     const name = uriToBasename(document.uri);
-
-    log(`validating ${name}`);
-
     const filePath = Files.uriToFilePath(document.uri);
     const documentText = document.getText();
 
-    const soliumStart = moment();
-    const soliumDiagnostics = solium(filePath, documentText);
-    const soliumEnd = moment();
+    let diagnostics = [];
 
-    const solcStart = moment();
-    const solcDiagnostics = compilationErrors(filePath, documentText);
-    const solcEnd = moment();
+    if (validators === true || validators === 'solium-only') {
+        const soliumStart = moment();
+        diagnostics = diagnostics.concat(solium(filePath, documentText));
+        const soliumEnd = moment();
 
-    const diagnostics = soliumDiagnostics.concat(solcDiagnostics);
+        log(`validating ${name}, solium done in ${soliumEnd.diff(soliumStart, 'seconds')}s`);
+    }
+
+    if (validators === true || validators === 'solc-only') {
+        const solcStart = moment();
+        diagnostics = diagnostics.concat(compilationErrors(filePath, documentText));
+        const solcEnd = moment();
+
+        log(`validating ${name}, solc done in ${solcEnd.diff(solcStart, 'seconds')}s`);
+    }
 
     connection.sendDiagnostics({
         diagnostics,
@@ -252,31 +255,42 @@ function validate(document) {
     });
 
     unlockValidation();
-
-    log(`validating ${name} done in ${moment().diff(start, 'seconds')}s ` +
-        `(solium: ${soliumEnd.diff(soliumStart, 'seconds')}s, solc: ${solcEnd.diff(solcStart, 'seconds')}s)`);
 }
 
 function validateAll() {
     log('validateAll');
 
-    return documents.all().forEach(validate);
+    return documents.all().forEach((document) => validate(document));
 }
+
+documents.onDidOpen(event => {
+    log(`document opened: ${uriToBasename(event.document.uri)}`);
+
+    if (!soliditySettings.lintOnOpen) {
+        return;
+    }
+
+    validate(event.document, soliditySettings.lintOnOpen);
+});
 
 documents.onDidSave(event => {
     log(`document saved: ${uriToBasename(event.document.uri)}`);
 
-    if (soliditySettings.lintOnSave) {
-        validate(event.document);
+    if (!soliditySettings.lintOnSave) {
+        return;
     }
+
+    validate(event.document, soliditySettings.lintOnSave);
 });
 
 documents.onDidChangeContent(event => {
     log(`document changed: ${uriToBasename(event.document.uri)}`);
 
-    if (soliditySettings.lintOnChange) {
-        validate(event.document);
+    if (!soliditySettings.lintOnChange) {
+        return;
     }
+
+    validate(event.document, soliditySettings.lintOnChange);
 });
 
 // remove diagnostics from the Problems panel when we close the file
@@ -292,10 +306,13 @@ interface CompilerRemapping {
     target: string;
 }
 
+type LinterChoice = true | false | 'solc-only' | 'solium-only';
+
 interface SoliditySettings {
     compilerRemappings: [CompilerRemapping];
-    lintOnChange: boolean;
-    lintOnSave: boolean;
+    lintOnChange: LinterChoice;
+    lintOnOpen: LinterChoice;
+    lintOnSave: LinterChoice;
     remoteCompilerVersion: string;
 }
 
