@@ -5,7 +5,6 @@ import * as solc from 'solc';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
-import * as artifactor from 'truffle-artifactor';
 
 import { errorToDiagnostic } from './compilerErrors';
 import { DiagnosticSeverity } from 'vscode';

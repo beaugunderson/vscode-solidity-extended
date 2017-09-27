@@ -7,7 +7,7 @@
     "ethereum",
     "blockchain"
   ],
-  "version": "2.4.2",
+  "version": "2.5.0",
   "publisher": "beaugunderson",
   "engines": {
     "vscode": "^1.8.0"
@@ -47,20 +47,19 @@
   },
   "dependencies": {
     "find-up": "^2.1.0",
-    "fs-extra": "^4.0.1",
+    "fs-extra": "^4.0.2",
     "moment": "^2.18.1",
     "read-yaml": "^1.1.0",
-    "solc": "^0.4.16",
+    "solc": "^0.4.17",
     "solium": "^0.5.5",
-    "truffle-artifactor": "^2.1.5",
-    "vscode-languageclient": "^3.3.0",
-    "vscode-languageserver": "^3.3.0",
+    "vscode-languageclient": "^3.4.5",
+    "vscode-languageserver": "^3.4.3",
     "vscode-uri": "^1.0.1"
   },
   "devDependencies": {
-    "@types/node": "^8.0.26",
+    "@types/node": "^8.0.31",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.2",
+    "typescript": "^2.5.3",
     "vscode": "^1.1.5"
   },
   "contributes": {
@@ -141,6 +140,11 @@
           "type": "boolean",
           "default": true,
           "description": "Persist errors for any linters that aren't run (e.g. persist solium errors if only solc is run)"
+        },
+        "solidity.solidityRoot": {
+          "type": "string",
+          "default": "",
+          "description": "A path relative to the workspace root that will serve as the root for compiling solidity files"
         }
       }
     },

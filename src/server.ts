@@ -128,7 +128,7 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
         contracts.addContractAndResolveImports(
             filePath,
             documentText,
-            projService.initialiseProject(rootPath));
+            projService.initialiseProject(path.resolve(rootPath, soliditySettings.solidityRoot)));
 
         let input = {
             language: 'Solidity',
@@ -144,9 +144,15 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
         };
 
         const output: string = solc.compileStandardWrapper(JSON.stringify(input), (importPath) => {
+            let sourcePath = importPath;
+
+            if (soliditySettings.solidityRoot) {
+                sourcePath = path.resolve(rootPath, soliditySettings.solidityRoot, importPath);
+            }
+
             try {
                 return {
-                    contents: fs.readFileSync(importPath, 'utf-8'),
+                    contents: fs.readFileSync(sourcePath, 'utf-8'),
                 };
             } catch (err) {
                 return {
@@ -324,6 +330,7 @@ interface SoliditySettings {
     lintOnSave: LinterChoice;
     persistErrors: boolean;
     remoteCompilerVersion: string;
+    solidityRoot: string;
 }
 
 let soliditySettings: SoliditySettings;
@@ -346,7 +353,7 @@ connection.onDidChangeConfiguration(params => {
 });
 
 connection.onInitialize((result): InitializeResult => {
-    rootPath = result.rootPath;
+    rootPath = Uri.parse(result.rootUri).fsPath;
 
     let localSolium = path.join(rootPath, 'node_modules', 'solium', 'lib', 'solium.js');
 

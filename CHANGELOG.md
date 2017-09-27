@@ -1,3 +1,7 @@
+## 2.5.0
+
+- Add `solidity.solidityRoot` configuration option for resolving imports correctly within `solc`
+
 ## 2.4.2
 
 - Add proper highlighting for `using`
