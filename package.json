@@ -10,7 +10,7 @@
   "version": "2.5.0",
   "publisher": "beaugunderson",
   "engines": {
-    "vscode": "^1.8.0"
+    "vscode": "^1.16.0"
   },
   "contributors": [
     "Beau Gunderson",
