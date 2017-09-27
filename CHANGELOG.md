@@ -1,3 +1,7 @@
+## 2.5.1
+
+- Restrict `solc` errors to those in the current file
+
 ## 2.5.0
 
 - Add `solidity.solidityRoot` configuration option for resolving imports correctly within `solc`

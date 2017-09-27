@@ -121,6 +121,18 @@ function itemToDiagnostic(item) {
     };
 }
 
+function arePathsIdentical(a, b) {
+    const fullRoot = path.normalize(path.resolve(rootPath, soliditySettings.solidityRoot));
+    const RE_ROOT_PATH = new RegExp(`^${fullRoot}/`);
+
+    const relativeA = path.normalize(a).replace(RE_ROOT_PATH, '');
+    const relativeB = path.normalize(b).replace(RE_ROOT_PATH, '');
+
+    if (relativeA === relativeB) {
+        return true;
+    }
+}
+
 function compilationErrors(filePath, documentText): Diagnostic[] {
     const contracts = new ContractCollection();
 
@@ -165,7 +177,10 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
             const parsedOutput = JSON.parse(output);
 
             if (parsedOutput.errors) {
-                return parsedOutput.errors.map((error) => errorToDiagnostic(error).diagnostic);
+                return parsedOutput.errors
+                    .map(errorToDiagnostic)
+                    .filter((error) => arePathsIdentical(error.fileName, filePath))
+                    .map((error) => error.diagnostic);
             }
         }
 
