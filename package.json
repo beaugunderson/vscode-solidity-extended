@@ -35,9 +35,7 @@
     "Snippets"
   ],
   "activationEvents": [
-    "onLanguage:solidity",
-    "onCommand:solidity.compile",
-    "onCommand:solidity.compile.active"
+    "onLanguage:solidity"
   ],
   "main": "./out/src/extension",
   "scripts": {
@@ -67,14 +65,6 @@
       "type": "object",
       "title": "Solidity configuration",
       "properties": {
-        "solidity.compileUsingRemoteVersion": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "default": null,
-          "description": "Compile using a remote version instead of the current one, for example: 'latest' or 'v0.4.3+commit.2353da71'"
-        },
         "solidity.compilerRemappings": {
           "type": "array",
           "items": {
@@ -159,30 +149,6 @@
           ".sol"
         ],
         "configuration": "./solidity.configuration.json"
-      }
-    ],
-    "commands": [
-      {
-        "command": "solidity.compile",
-        "title": "Solidity: Compile All Solidity Contracts"
-      },
-      {
-        "command": "solidity.compile.active",
-        "title": "Solidity: Compile Current Solidity Contract"
-      }
-    ],
-    "keybindings": [
-      {
-        "command": "solidity.compile.active",
-        "key": "f5",
-        "mac": "f5",
-        "when": "editorTextFocus && editorLangId == 'solidity'"
-      },
-      {
-        "command": "solidity.compile",
-        "key": "Ctrl+f5",
-        "mac": "Cmd+f5",
-        "when": "editorTextFocus && editorLangId == 'solidity'"
       }
     ],
     "snippets": [

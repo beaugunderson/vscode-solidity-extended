@@ -4,8 +4,6 @@ import * as findUp from 'find-up';
 import * as fs from 'fs';
 import * as moment from 'moment';
 import * as path from 'path';
-import * as projService from './projectService';
-import * as solc from 'solc';
 import {
     Diagnostic,
     DiagnosticSeverity,
@@ -14,14 +12,13 @@ import {
     IPCMessageReader,
     IPCMessageWriter,
     InitializeResult,
-    TextDocumentChangeEvent,
     TextDocuments,
     createConnection,
 } from 'vscode-languageserver';
 import Uri from 'vscode-uri';
 
-import {ContractCollection} from './model/contractsCollection';
-import {errorToDiagnostic} from './compilerErrors';
+import {ContractCollection} from './contract-collection';
+import {errorToDiagnostic} from './compiler-errors';
 
 const TWO_MINUTES = 2 * 60 * 1000;
 
@@ -62,28 +59,6 @@ function unlockValidation() {
     validationLocked = 0;
 }
 
-const DEFAULT_SOLIUM_OPTIONS = {
-    rules: {
-        'array-declarations': true,
-        'blank-lines': true,
-        camelcase: true,
-        'deprecated-suicide': true,
-        'double-quotes': true,
-        'imports-on-top': true,
-        indentation: true,
-        lbrace: true,
-        mixedcase: true,
-        'no-empty-blocks': true,
-        'no-unused-vars': true,
-        'no-with': true,
-        'operator-whitespace': true,
-        'pragma-on-top': true,
-        uppercase: true,
-        'variable-declarations': true,
-        whitespace: true,
-    },
-};
-
 // Create a connection for the server
 const connection: IConnection = createConnection(
     new IPCMessageReader(process),
@@ -95,6 +70,7 @@ console.error = connection.console.error.bind(connection.console);
 const documents: TextDocuments = new TextDocuments();
 
 let rootPath;
+let solc;
 let Solium;
 
 function itemToDiagnostic(item) {
@@ -137,10 +113,7 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
     const contracts = new ContractCollection();
 
     try {
-        contracts.addContractAndResolveImports(
-            filePath,
-            documentText,
-            projService.initialiseProject(path.resolve(rootPath, soliditySettings.solidityRoot)));
+        contracts.addContractAndResolveImports(filePath, documentText);
 
         let input = {
             language: 'Solidity',
@@ -197,19 +170,40 @@ function compilationErrors(filePath, documentText): Diagnostic[] {
 
 function solium(filePath, documentText): Diagnostic[] {
     const fileDirectory = path.dirname(filePath);
-    const fileName = path.basename(filePath);
-
-    let items = [];
-    let soliumOptions = DEFAULT_SOLIUM_OPTIONS;
-
     const soliumConfigPath = findUp.sync('.soliumrc.json', {cwd: fileDirectory});
 
-    if (soliumConfigPath) {
-        soliumOptions = require(soliumConfigPath);
+    if (!soliumConfigPath) {
+        log('Skipping solium, .soliumrc.json not found');
+
+        return [];
+    }
+
+    log(`Using "${soliumConfigPath}"`);
+
+    let soliumOptions;
+
+    try {
+        soliumOptions = JSON.parse(fs.readFileSync(soliumConfigPath, 'utf8'));
+    } catch (err) {
+        return [
+            {
+                message: `Unable to parse .soliumrc.json: ${err.message}`,
+                range: {
+                    end: {
+                        character: 0,
+                        line: 0,
+                    },
+                    start: {
+                        character: 0,
+                        line: 0,
+                    },
+                },
+            },
+        ];
     }
 
     try {
-        items = Solium.lint(documentText, soliumOptions);
+        return Solium.lint(documentText, soliumOptions).map(itemToDiagnostic);
     } catch (err) {
         let match = /An error .*?\nSyntaxError: (.*?) Line: (\d+), Column: (\d+)/.exec(err.message);
 
@@ -238,8 +232,6 @@ function solium(filePath, documentText): Diagnostic[] {
             console.error('solium error: ' + err);
         }
     }
-
-    return items.map(itemToDiagnostic);
 }
 
 function validate(document, validators: LinterChoice = true) {
@@ -370,7 +362,8 @@ connection.onDidChangeConfiguration(params => {
 connection.onInitialize((result): InitializeResult => {
     rootPath = Uri.parse(result.rootUri).fsPath;
 
-    let localSolium = path.join(rootPath, 'node_modules', 'solium', 'lib', 'solium.js');
+    const localSolium = path.join(rootPath, 'node_modules', 'solium', 'lib', 'solium.js');
+    const localSolc = path.join(rootPath, 'node_modules', 'solc', 'index.js');
 
     if (fs.existsSync(localSolium)) {
         log('loading local solium');
@@ -380,6 +373,16 @@ connection.onInitialize((result): InitializeResult => {
         log('loading global solium');
 
         Solium = require('solium');
+    }
+
+    if (fs.existsSync(localSolc)) {
+        log('loading local solc');
+
+        solc = require(localSolc);
+    } else {
+        log('loading global solc');
+
+        solc = require('solc');
     }
 
     return {

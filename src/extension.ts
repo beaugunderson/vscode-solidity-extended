@@ -1,12 +1,8 @@
 'use strict';
 
 import * as path from 'path';
-import {compileAllContracts} from './compileAll';
-import {compileActiveContract, initDiagnosticCollection} from './compileActive';
-import {DiagnosticCollection, ExtensionContext, commands, languages, workspace} from 'vscode';
+import {ExtensionContext, workspace} from 'vscode';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind} from 'vscode-languageclient';
-
-let diagnosticCollection: DiagnosticCollection;
 
 export function activate(context: ExtensionContext) {
     const serverModule = path.join(__dirname, 'server.js');
@@ -39,20 +35,5 @@ export function activate(context: ExtensionContext) {
         serverOptions,
         clientOptions);
 
-    diagnosticCollection = languages.createDiagnosticCollection('solidity');
-
-    context.subscriptions.push(diagnosticCollection);
-
-    initDiagnosticCollection(diagnosticCollection);
-
-    context.subscriptions.push(
-        client.start(),
-
-        commands.registerCommand('solidity.compile.active', () => {
-            compileActiveContract();
-        }),
-
-        commands.registerCommand('solidity.compile', () => {
-            compileAllContracts(diagnosticCollection);
-        }));
+    context.subscriptions.push(client.start());
 }

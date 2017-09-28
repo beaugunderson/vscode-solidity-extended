@@ -1,3 +1,10 @@
+## 3.0.0
+
+- The extension will no longer generate `solium` warnings if a `.soliumrc.json` file does not exist in the project. Previously we generated `solium` warnings using a default configuration
+- The compilation commands have been removed; they were broken and not that useful given current workflows
+- `.soliumrc.json` is now re-read when it is modified instead of just re-validating all files using the old values
+- The extension will now use the local `solc` if it exists in `${workspaceRoot}/node_modules`
+
 ## 2.5.1
 
 - Restrict `solc` errors to those in the current file

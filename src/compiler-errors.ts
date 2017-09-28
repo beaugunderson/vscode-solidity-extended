@@ -1,5 +1,12 @@
 
-import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver';
+import { DiagnosticSeverity } from 'vscode-languageserver';
+
+interface CompilerError {
+    diagnostic: any;
+    fileName: string;
+}
+
+const RE_ERROR_LOCATION = /^(\s*)(\^-*\^{0,1})\s*$/;
 
 function getDiagnosticSeverity(severity: string): DiagnosticSeverity {
     switch (severity) {
@@ -11,13 +18,6 @@ function getDiagnosticSeverity(severity: string): DiagnosticSeverity {
             return DiagnosticSeverity.Error;
     }
 }
-
-interface CompilerError {
-    diagnostic: any;
-    fileName: string;
-}
-
-const RE_ERROR_LOCATION = /^(\s*)(\^-*\^{0,1})\s*$/;
 
 export function errorToDiagnostic(error: any): CompilerError {
     const errorSplit = error.formattedMessage.split(':');
