@@ -1,4 +1,4 @@
-## 3.0.1
+## 3.0.1, 3.0.2
 
 - Add `pure` and `view` function modifiers to syntax highlighting
 
