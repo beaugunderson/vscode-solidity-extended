@@ -1,3 +1,7 @@
+## 3.0.1
+
+- Add `pure` and `view` function modifiers to syntax highlighting
+
 ## 3.0.0
 
 - The extension will no longer generate `solium` warnings if a `.soliumrc.json` file does not exist in the project. Previously we generated `solium` warnings using a default configuration

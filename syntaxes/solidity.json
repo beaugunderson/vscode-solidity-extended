@@ -64,7 +64,7 @@
                 }
             },
             "comment": "Mapping definition",
-            "match": "\\b(mapping)\\s*\\((.*)\\s+=>\\s+(.*)\\)(\\s+(?:private|public|external|internal|inherited))?\\s+([A-Za-z_]\\w*)\\b"
+            "match": "\\b(mapping)\\s*\\((.*)\\s+=>\\s+(.*)\\)(\\s+(?:external|inherited|internal|private|public|pure|view))?\\s+([A-Za-z_]\\w*)\\b"
         },
         {
             "comment": "True and false keywords",
