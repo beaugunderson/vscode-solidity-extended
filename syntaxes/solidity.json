@@ -73,7 +73,7 @@
         },
         {
             "comment": "Langauge keywords",
-            "match": "\\b(var|import|function|constant|if|else|using|for|while|do|break|continue|throw|returns?|private|public|external|internal|inherited|this|suicide|new|is|pure|view|\\_)\\b",
+            "match": "\\b(var|import|function|constant|if|else|using|for|while|do|break|continue|throw|returns?|private|public|external|internal|inherited|this|suicide|new|is|pure|view|delete|\\_)\\b",
             "name": "keyword.control"
         },
         {
