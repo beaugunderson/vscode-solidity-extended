@@ -177,6 +177,15 @@ function solium(filePath, documentText): Diagnostic[] {
 
         return [];
     }
+    if (soliumConfigPath && soliditySettings.multiProjects) {
+      const projectDirectory = path.dirname(soliumConfigPath);
+      const projectLocalSolium = path.join(projectDirectory, 'node_modules', 'solium', 'lib', 'solium.js');
+      const projectLocalSolc = path.join(projectDirectory, 'node_modules', 'solc', 'index.js');
+      if (fs.existsSync(projectLocalSolium)) {
+          Solium = require(projectLocalSolium);
+          solc = require(projectLocalSolc);
+      }
+    }
 
     log(`Using "${soliumConfigPath}"`);
 
@@ -338,6 +347,7 @@ interface SoliditySettings {
     persistErrors: boolean;
     remoteCompilerVersion: string;
     solidityRoot: string;
+    multiProjects: boolean;
 }
 
 let soliditySettings: SoliditySettings;

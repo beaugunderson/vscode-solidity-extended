@@ -135,6 +135,11 @@
           "type": "string",
           "default": "",
           "description": "A path relative to the workspace root that will serve as the root for compiling solidity files"
+        },
+        "solidity.multiProjects": {
+          "type": "boolean",
+          "default": false,
+          "description": "Tries to find solc and solium in project folder when there are multiple projects in the workspace"
         }
       }
     },
